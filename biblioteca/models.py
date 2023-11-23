@@ -18,3 +18,19 @@ class Libro(models.Model):
     fecha_publicacion = models.DateField()
     genero = models.CharField(max_length=20)
     resumen = models.TextField()
+    DISPONIBILIDAD = (
+        ("D", "Disponible"),
+        ("P", "Prestado"),
+        ("E", "En proceso de préstamo"),
+    )
+    portada = models.ImageField()
+
+
+class Autor(models.Model):
+    nombre = models.CharField(primary_key=True)
+    biogafia = models.TextField()
+    foto = models.ImageField()
+
+
+class Editorial(models.Model):
+    nombre = models.CharField(max_length=15)
