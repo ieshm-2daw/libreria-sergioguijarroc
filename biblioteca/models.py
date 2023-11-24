@@ -6,8 +6,8 @@ from django.core.validators import MaxValueValidator
 
 
 class Usuario(AbstractUser):
-    dni = models.CharField(max_length=9, primary_key=True)
-    direccion = models.TextField()
+    dni = models.CharField(max_length=9, unique=True)
+    direccion = models.CharField(max_length=200)
     telefono = models.IntegerField(validators=[MaxValueValidator(9)])
 
 
@@ -30,7 +30,10 @@ class Libro(models.Model):
         ("P", "Prestado"),
         ("E", "En proceso de préstamo"),
     )  # Esto es una tupla de tuplas (tupla anidada) para que el usuario solo pueda elegir entre las opciones que le damos
-    portada = models.ImageField()
+    disponibilidad = models.CharField(max_length=20, choices=DISPONIBILIDAD)
+    portada = models.ImageField(
+        upload_to="portadas/", null=True, blank=True
+    )  # Se crea en una carpeta portadas que se mete dentro de nuestra carpeta MEDIA definida en el settings.py
 
 
 class Editorial(models.Model):
@@ -44,4 +47,8 @@ class Prestamo(models.Model):
     fecha_prestamo = models.DateField()
     fecha_devolucion = models.DateField()
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    estado_prestamo = models.CharField(max_length=1, choices=Libro.DISPONIBILIDAD)
+    DISPONIBILIDAD = (
+        ("D", "Disponible"),
+        ("P", "Prestado"),
+    )
+    estado_prestamo = models.CharField(max_length=1, choices=DISPONIBILIDAD)
