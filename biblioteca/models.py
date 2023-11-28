@@ -6,9 +6,11 @@ from django.core.validators import MaxValueValidator
 
 
 class Usuario(AbstractUser):
-    dni = models.CharField(max_length=9, unique=True)
-    direccion = models.CharField(max_length=200)
-    telefono = models.IntegerField(validators=[MaxValueValidator(9)])
+    dni = models.CharField(max_length=9, unique=True, null=True, blank=True)
+    direccion = models.CharField(max_length=200, null=True, blank=True)
+    telefono = models.IntegerField(
+        validators=[MaxValueValidator(9)], null=True, blank=True
+    )
 
 
 class Autor(models.Model):
@@ -19,9 +21,12 @@ class Autor(models.Model):
 
 
 class Libro(models.Model):
-    isbn = models.CharField(max_length=13, primary_key=True)
-    autor = models.ForeignKey(Autor, on_delete=models.CASCADE)
-    editorial = models.ForeignKey("Editorial", on_delete=models.CASCADE)
+    isbn = models.CharField(max_length=13)
+    titulo = models.CharField(max_length=50)
+    autor = models.ForeignKey(Autor, on_delete=models.CASCADE, blank=True, null=True)
+    editorial = models.ForeignKey(
+        "Editorial", on_delete=models.CASCADE, blank=True, null=True
+    )
     fecha_publicacion = models.DateField()
     genero = models.CharField(max_length=20)
     resumen = models.TextField()
@@ -31,9 +36,11 @@ class Libro(models.Model):
         ("E", "En proceso de préstamo"),
     )  # Esto es una tupla de tuplas (tupla anidada) para que el usuario solo pueda elegir entre las opciones que le damos
     disponibilidad = models.CharField(max_length=20, choices=DISPONIBILIDAD)
-    portada = models.ImageField(
-        upload_to="portadas/", null=True, blank=True
-    )  # Se crea en una carpeta portadas que se mete dentro de nuestra carpeta MEDIA definida en el settings.py
+    # portada = models.ImageField(
+    #    upload_to="portadas/", null=True, blank=True
+
+
+# )  # Se crea en una carpeta portadas que se mete dentro de nuestra carpeta MEDIA definida en el settings.py
 
 
 class Editorial(models.Model):

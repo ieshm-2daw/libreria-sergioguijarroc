@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h2>Detalles del libro {{object.titulo}}</h2>
+    <p>ISBN: {{object.isbn}}</p>
+    <p>autor: {{object.autor}}</p>
+    <p>editorial: {{object.editorial}}</p>
+    <p>fecha de publicacion: {{object.fecha_publicacion}}</p>
+    <p>genero: {{object.genero}}</p>
+    <p>resumen: {{object.resumen}}</p>
+    <p>disponibilidad: {{object.disponibilidad}}</p>
+    <a href="{%url 'editar_libro' object.pk %}">Editar este libro</a>
+    <a href="{%url 'eliminar_libro' object.pk %}">Eliminar este libro</a>
+</body>
+
+</html>
