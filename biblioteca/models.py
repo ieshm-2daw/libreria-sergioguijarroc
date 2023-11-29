@@ -11,7 +11,7 @@ class Usuario(AbstractUser):
     telefono = models.IntegerField(
         validators=[MaxValueValidator(9)], null=True, blank=True
     )
-    prestamo = models.ManyToManyField("Prestamo", blank=True)
+    Prestamo = models.ForeignKey("Prestamo", on_delete=models.CASCADE, blank=True)
 
 
 class Autor(models.Model):
@@ -24,10 +24,8 @@ class Autor(models.Model):
 class Libro(models.Model):
     isbn = models.CharField(max_length=13)
     titulo = models.CharField(max_length=50)
-    autor = models.ManyToManyField(Autor, on_delete=models.CASCADE, blank=True)
-    editorial = models.ManyToManyField(
-        "Editorial", on_delete=models.CASCADE, blank=True
-    )
+    autor = models.ManyToManyField(Autor, blank=True)
+    Editorial = models.ForeignKey("Editorial", blank=True, on_delete=models.CASCADE)
     fecha_publicacion = models.DateField()
     genero = models.CharField(max_length=20)
     resumen = models.TextField()
@@ -47,14 +45,14 @@ class Editorial(models.Model):
     nombre = models.CharField(max_length=15)
     direccion = models.TextField()
     sitio_web = models.URLField()
-    libros = models.ManyToManyField(Libro, blank=True)
+    Libros = models.ForeignKey(Libro, blank=True, on_delete=models.CASCADE)
 
 
 class Prestamo(models.Model):
     libro_prestado = models.ForeignKey(Libro, on_delete=models.CASCADE)
     fecha_prestamo = models.DateField()
     fecha_devolucion = models.DateField()
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    Usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     DISPONIBILIDAD = (
         ("D", "Disponible"),
         ("P", "Prestado"),
