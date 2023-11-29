@@ -11,6 +11,7 @@ class Usuario(AbstractUser):
     telefono = models.IntegerField(
         validators=[MaxValueValidator(9)], null=True, blank=True
     )
+    prestamo = models.ManyToManyField("Prestamo", blank=True)
 
 
 class Autor(models.Model):
@@ -23,9 +24,9 @@ class Autor(models.Model):
 class Libro(models.Model):
     isbn = models.CharField(max_length=13)
     titulo = models.CharField(max_length=50)
-    autor = models.ForeignKey(Autor, on_delete=models.CASCADE, blank=True, null=True)
-    editorial = models.ForeignKey(
-        "Editorial", on_delete=models.CASCADE, blank=True, null=True
+    autor = models.ManyToManyField(Autor, on_delete=models.CASCADE, blank=True)
+    editorial = models.ManyToManyField(
+        "Editorial", on_delete=models.CASCADE, blank=True
     )
     fecha_publicacion = models.DateField()
     genero = models.CharField(max_length=20)
@@ -36,8 +37,7 @@ class Libro(models.Model):
         ("E", "En proceso de préstamo"),
     )  # Esto es una tupla de tuplas (tupla anidada) para que el usuario solo pueda elegir entre las opciones que le damos
     disponibilidad = models.CharField(max_length=20, choices=DISPONIBILIDAD)
-    # portada = models.ImageField(
-    #    upload_to="portadas/", null=True, blank=True
+    portada = models.ImageField(upload_to="portadas/", null=True, blank=True)
 
 
 # )  # Se crea en una carpeta portadas que se mete dentro de nuestra carpeta MEDIA definida en el settings.py
@@ -47,6 +47,7 @@ class Editorial(models.Model):
     nombre = models.CharField(max_length=15)
     direccion = models.TextField()
     sitio_web = models.URLField()
+    libros = models.ManyToManyField(Libro, blank=True)
 
 
 class Prestamo(models.Model):

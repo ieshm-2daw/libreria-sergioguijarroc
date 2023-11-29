@@ -16,6 +16,9 @@
     <p>genero: {{object.genero}}</p>
     <p>resumen: {{object.resumen}}</p>
     <p>disponibilidad: {{object.disponibilidad}}</p>
+    {%if object.portada%} #Portada es el nombre del atributo de imagen
+    <img src="{{object.portada.url}}" alt="">
+    {%endif%}
     <a href="{%url 'editar_libro' object.pk %}">Editar este libro</a>
     <a href="{%url 'eliminar_libro' object.pk %}">Eliminar este libro</a>
 </body>

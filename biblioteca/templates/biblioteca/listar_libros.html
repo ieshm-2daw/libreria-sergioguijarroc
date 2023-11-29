@@ -12,6 +12,9 @@
     <p>{{object.isbn}}</p>
     <p>{{object.titulo}}</p>
     <p>{{object.autor}}</p>
+    {%if object.portada%}
+    <img src="{{object.portada.url}}" alt="">
+    {%endif%}
     <a href="{% url 'detalle_libro' object.pk %}">Detalles</a>
     <br>
     {%endfor%}
