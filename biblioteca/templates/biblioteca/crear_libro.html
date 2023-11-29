@@ -10,7 +10,7 @@
 <body>
     <form action="" enctype="multipart/form-data" method="post">
         {%csrf_token%}
-        {{for autor in autores.all}}
+
 
         {{form.as_p}}
         <input type="submit" value="Enviar">

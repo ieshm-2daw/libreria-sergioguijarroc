@@ -8,7 +8,20 @@
 </head>
 
 <body>
-    {%for object in libro_list%}
+    <h2>Libros disponibles</h2>
+    {%for object in libros_disponibles%}
+    <p>{{object.isbn}}</p>
+    <p>{{object.titulo}}</p>
+    <p>{{object.autor}}</p>
+    {%if object.portada%}
+    <img src="{{object.portada.url}}" alt="">
+    {%endif%}
+    <a href="{% url 'detalle_libro' object.pk %}">Detalles</a>
+    <br>
+    {%endfor%}
+
+    <h2>Libros no disponibles</h2>
+    {%for object in libros_prestados%}
     <p>{{object.isbn}}</p>
     <p>{{object.titulo}}</p>
     <p>{{object.autor}}</p>
