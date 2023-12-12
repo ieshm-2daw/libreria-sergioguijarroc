@@ -1,43 +1,44 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "biblioteca/base.html" %} {%block title%} Libros {%endblock%} {%block content%}
+<div class="row">
+    <div class="col-12">
+        <h2>Libros disponibles</h2>
+        {%for object in libros_disponibles%}
+        <p>{{object.isbn}}</p>
+        <p>{{object.titulo}}</p>
+        <p>{{object.autor}}</p>
+        {%if object.portada%}
+        <img src="{{object.portada.url}}" alt="" />
+        {%endif%}
+        <a href="{% url 'detalle_libro' object.pk %}">Detalles</a>
+        <br />
+        {%endfor%}
+    </div>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
+    <div class="col-12">
+        <h2>Libros no disponibles</h2>
+        {%for object in libros_prestados%}
+        <p>{{object.isbn}}</p>
+        <p>{{object.titulo}}</p>
+        <p>{{object.autor}}</p>
+        {%if object.portada%}
+        <img src="{{object.portada.url}}" alt="" />
+        {%endif%}
+        <br />
+        <a href="{% url 'detalle_libro' object.pk %}">Detalles</a>
+        <br />
+        {%endfor%}
 
-<body>
-    <h2>Libros disponibles</h2>
-    {%for object in libros_disponibles%}
-    <p>{{object.isbn}}</p>
-    <p>{{object.titulo}}</p>
-    <p>{{object.autor}}</p>
-    {%if object.portada%}
-    <img src="{{object.portada.url}}" alt="">
-    {%endif%}
-    <a href="{% url 'detalle_libro' object.pk %}">Detalles</a>
-    <br>
-    {%endfor%}
+    </div>
+    <div class="row">
+        <div class="col">
+            <input type="button" value="Crear un libro" onclick="location.href='{%url 'crear_libro'%}'" />
 
-    <h2>Libros no disponibles</h2>
-    {%for object in libros_prestados%}
-    <p>{{object.isbn}}</p>
-    <p>{{object.titulo}}</p>
-    <p>{{object.autor}}</p>
-    {%if object.portada%}
-    <img src="{{object.portada.url}}" alt="">
-    {%endif%}
-    <a href="{% url 'detalle_libro' object.pk %}">Detalles</a>
-    <br>
-    {%endfor%}
+            <br />
+            <a href="{%url 'listar_prestamos'%}">Listar préstamos</a>
+            <br />
+            <a href="{%url 'listar_devueltos'%}">Listar devueltos</a>
+        </div>
+    </div>
+</div>
 
-    <a href="{%url 'crear_libro'%}">Crear un libro</a>
-    <br>
-    <a href="{%url 'listar_prestamos'%}">Listar préstamos</a>
-    <br>
-    <a href="{%url 'listar_devueltos'%}">Listar devueltos</a>
-    
-</body>
-
-</html>
+{%endblock%}

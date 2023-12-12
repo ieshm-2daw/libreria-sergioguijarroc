@@ -1,13 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "biblioteca/base.html" %} {%block title%} Libros {%endblock%} {%block
+content%}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-
-<body>
+<div class="row">
+  <div class="col">
     <h2>Detalles del libro {{object.titulo}}</h2>
     <p>ISBN: {{object.isbn}}</p>
     <p>autor: {{object.autor}}</p>
@@ -17,12 +12,13 @@
     <p>resumen: {{object.resumen}}</p>
     <p>disponibilidad: {{object.disponibilidad}}</p>
     {%if object.portada%} #Portada es el nombre del atributo de imagen
-    <img src="{{object.portada.url}}" alt="">
+    <img src="{{object.portada.url}}" alt="" />
     {%endif%}
     <a href="{% url 'editar_libro' object.pk %}">Editar este libro</a>
     <a href="{% url 'eliminar_libro' object.pk %}">Eliminar este libro</a>
     <a href="{% url 'prestar_libro' object.pk %}">Prestar este libro</a>
     <a href="{% url 'devolver_libro' object.pk %}">Devolver este libro</a>
-</body>
+  </div>
+</div>
 
-</html>
+{%endblock%}

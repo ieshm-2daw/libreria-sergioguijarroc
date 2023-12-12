@@ -1,20 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-
-<body>
+{% extends "biblioteca/base.html" %} {%block title%}Crear libro {%endblock%} {%
+block content %}
+<div class="row">
+  <div class="col">
     <form action="" enctype="multipart/form-data" method="post">
-        {%csrf_token%}
-
-
-        {{form.as_p}}
-        <input type="submit" value="Enviar">
+      {%csrf_token%} {{form.as_p}}
+      <input type="submit" value="Enviar" />
     </form>
-</body>
+  </div>
+</div>
 
-</html>
+{% endblock %}
