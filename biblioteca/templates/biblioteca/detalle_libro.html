@@ -19,8 +19,10 @@
     {%if object.portada%} #Portada es el nombre del atributo de imagen
     <img src="{{object.portada.url}}" alt="">
     {%endif%}
-    <a href="{%url 'editar_libro' object.pk %}">Editar este libro</a>
-    <a href="{%url 'eliminar_libro' object.pk %}">Eliminar este libro</a>
+    <a href="{% url 'editar_libro' object.pk %}">Editar este libro</a>
+    <a href="{% url 'eliminar_libro' object.pk %}">Eliminar este libro</a>
+    <a href="{% url 'prestar_libro' object.pk %}">Prestar este libro</a>
+    <a href="{% url 'devolver_libro' object.pk %}">Devolver este libro</a>
 </body>
 
 </html>

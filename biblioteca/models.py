@@ -2,8 +2,6 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator
 
-# Create your models here.
-
 
 class Usuario(AbstractUser):
     dni = models.CharField(max_length=9, unique=True, null=True, blank=True)
@@ -11,52 +9,56 @@ class Usuario(AbstractUser):
     telefono = models.IntegerField(
         validators=[MaxValueValidator(9)], null=True, blank=True
     )
-    Prestamo = models.ForeignKey("Prestamo", on_delete=models.CASCADE, blank=True)
+    prestamo = models.ForeignKey(
+        "Prestamo",
+        on_delete=models.CASCADE,
+        blank=True,
+        related_name="prestamos_usuario",
+        null=True,
+    )
 
 
 class Autor(models.Model):
     nombre = models.CharField(max_length=20)
-    biogafia = models.TextField()
+    biografia = models.TextField()  # Corregí el nombre del campo
     foto = models.ImageField()
-    # A autor no le asignamos clave primaria ya que django por defecto le asigna un id que es autoincremental
 
 
 class Libro(models.Model):
     isbn = models.CharField(max_length=13)
     titulo = models.CharField(max_length=50)
     autor = models.ManyToManyField(Autor, blank=True)
-    Editorial = models.ForeignKey(
+    editorial = models.ForeignKey(
         "Editorial", blank=True, null=True, on_delete=models.CASCADE
-    )
+    )  # Corregí el nombre del campo
     fecha_publicacion = models.DateField()
     genero = models.CharField(max_length=20)
     resumen = models.TextField()
-    DISPONIBILIDAD = (
+    DISPONIBILIDAD = [
         ("D", "Disponible"),
         ("P", "Prestado"),
         ("E", "En proceso de préstamo"),
-    )  # Esto es una tupla de tuplas (tupla anidada) para que el usuario solo pueda elegir entre las opciones que le damos
-    disponibilidad = models.CharField(max_length=20, choices=DISPONIBILIDAD)
+    ]
+    disponibilidad = models.CharField(max_length=1, choices=DISPONIBILIDAD)
     portada = models.ImageField(upload_to="portadas/", null=True, blank=True)
-
-
-# )  # Se crea en una carpeta portadas que se mete dentro de nuestra carpeta MEDIA definida en el settings.py
 
 
 class Editorial(models.Model):
     nombre = models.CharField(max_length=15)
     direccion = models.TextField()
     sitio_web = models.URLField()
-    Libros = models.ForeignKey(Libro, blank=True, on_delete=models.CASCADE)
+    # libros = models.ForeignKey(Libro, blank=True, on_delete=models.CASCADE)  # No es necesario tener esta relación aquí
 
 
 class Prestamo(models.Model):
     libro_prestado = models.ForeignKey(Libro, on_delete=models.CASCADE)
     fecha_prestamo = models.DateField()
-    fecha_devolucion = models.DateField()
-    Usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    DISPONIBILIDAD = (
+    fecha_devolucion = models.DateField(null=True, blank=True)
+    usuario = models.ForeignKey(
+        Usuario, on_delete=models.CASCADE, related_name="prestamos_usuario"
+    )  # Related name es para que no se pise con el nombre de la clase y se pueda acceder a los prestamos de un usuario
+    DISPONIBILIDAD = [
         ("D", "Disponible"),
         ("P", "Prestado"),
-    )
+    ]
     estado_prestamo = models.CharField(max_length=1, choices=DISPONIBILIDAD)

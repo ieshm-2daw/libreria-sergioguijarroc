@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h2>Libros prestados:</h2>
+    {%for prestamo in prestamos%}
+    <p>Libro: {{prestamo.libro}}</p>
+    <p>Fecha de prestamo: {{prestamo.fecha_prestamo}}</p>
+    <p>Fecha de devolucion: {{prestamo.fecha_devolucion}}</p>
+    <p>Usuario: {{prestamo.usuario}}</p>
+    <p>Estado: {{prestamo.estado}}</p>
+    {%endfor%}
+
+</body>
+
+</html>
