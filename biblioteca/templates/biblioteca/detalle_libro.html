@@ -10,6 +10,9 @@
     <p>genero: {{object.genero}}</p>
     <p>resumen: {{object.resumen}}</p>
     <p>disponibilidad: {{object.disponibilidad}}</p>
+    {%if object.valoracion_media%}
+    <p>Valoracion media del libro: {{object.valoracion_media}}</p>
+    {%endif%}
     {%if object.portada%}
     <img class="img-fluid w-75" src="{{object.portada.url}}" alt="" />
     {%endif%}
@@ -23,6 +26,8 @@
     <a href="{% url 'devolver_libro' object.pk %}">Devolver este libro</a>
     <br>
     <a href="{%url 'listar_libros'%}">Volver al listado</a>
+    <br>
+    <a href="{% url 'valoracion_libro' object.pk %}">Valorar este libro</a>
   </div>
 </div>
 

@@ -42,6 +42,7 @@ class Libro(models.Model):
     disponibilidad = models.CharField(max_length=1, choices=DISPONIBILIDAD, default="D")
     portada = models.ImageField(upload_to="portadas/", null=True, blank=True)
     valoracion_media = models.FloatField(blank=True, null=True, default=None)
+    numero_valoraciones = models.IntegerField(default=0)
 
 
 class Editorial(models.Model):

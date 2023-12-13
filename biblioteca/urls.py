@@ -8,6 +8,7 @@ from .views import (
     ListarPrestamos,
     ListarDevueltos,
     DevolverLibro,
+    ValoracionLibro,
 )
 from django.urls import path
 
@@ -21,4 +22,5 @@ urlpatterns = [
     path("prestamos/", ListarPrestamos.as_view(), name="listar_prestamos"),
     path("devueltos/", ListarDevueltos.as_view(), name="listar_devueltos"),
     path("devolver/<int:pk>", DevolverLibro.as_view(), name="devolver_libro"),
+    path("valoracion/<int:pk>", ValoracionLibro.as_view(), name="valoracion_libro"),
 ]

@@ -153,9 +153,17 @@ class ValoracionLibro(View):
 
     def post(self, request, pk):
         libro = Libro.objects.get(pk=pk)
-        libro.valoracion_media = request.POST[
-            "valoracion"
-        ]  # Esto es para que en el campo valoracion_media del libro se guarde la valoración que el usuario ha introducido en el formulario
-        # En el formulario lo tengo que meter en un input de tipo number y con un name="valoracion"
+        valoracionLibroMedia = libro.valoracion_media
+        valoracionUsuario = float(request.POST["valoracion"])
+        libro.numero_valoraciones += 1
+
+        if libro.numero_valoraciones > 0:
+            libro.valoracion_media = (
+                valoracionLibroMedia * (libro.numero_valoraciones - 1)
+                + valoracionUsuario
+            ) / libro.numero_valoraciones
+        else:
+            libro.numero_valoraciones = valoracionUsuario
+
         libro.save()
         return redirect("detalle_libro", pk=libro.pk)
