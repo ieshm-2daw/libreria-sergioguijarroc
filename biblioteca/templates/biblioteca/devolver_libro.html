@@ -1,7 +1,7 @@
 {% extends "biblioteca/base.html" %} {%block title%} Libros {%endblock%} {%block content%}
 <div class="row">
   <div class="col">
-    <form action="{% url 'devolver_libro' libro.pk %}" method="post">
+    <form  method="post">
       <!--no hace falta el action, así se mete a sí misma-->
       {%csrf_token%}
       <input type="submit" value="Devolver" />

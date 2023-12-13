@@ -127,3 +127,18 @@ class DevolverLibro(View):
         prestamo.estado_prestamo = "D"
         prestamo.save()
         return redirect("detalle_libro", pk=libro.pk)
+
+
+class ValoracionLibro(View):
+    def get(self, request, pk):
+        libro = Libro.objects.get(pk=pk)
+        return render(request, "biblioteca/valoracion_libro.html", {"libro": libro})
+
+    def post(self, request, pk):
+        libro = Libro.objects.get(pk=pk)
+        libro.valoracion_media = request.POST[
+            "valoracion"
+        ]  # Esto es para que en el campo valoracion_media del libro se guarde la valoración que el usuario ha introducido en el formulario
+        # En el formulario lo tengo que meter en un input de tipo number y con un name="valoracion"
+        libro.save()
+        return redirect("detalle_libro", pk=libro.pk)

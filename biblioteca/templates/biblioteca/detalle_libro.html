@@ -10,13 +10,18 @@
     <p>genero: {{object.genero}}</p>
     <p>resumen: {{object.resumen}}</p>
     <p>disponibilidad: {{object.disponibilidad}}</p>
-    {%if object.portada%} #Portada es el nombre del atributo de imagen
-    <img class="img-fluid" src="{{object.portada.url}}" alt="" />
+    {%if object.portada%}
+    <img class="img-fluid w-75" src="{{object.portada.url}}" alt="" />
     {%endif%}
+    <br>
     <a href="{% url 'editar_libro' object.pk %}">Editar este libro</a>
+    <br>
     <a href="{% url 'eliminar_libro' object.pk %}">Eliminar este libro</a>
+    <br>
     <a href="{% url 'prestar_libro' object.pk %}">Prestar este libro</a>
+    <br>
     <a href="{% url 'devolver_libro' object.pk %}">Devolver este libro</a>
+    <br>
     <a href="{%url 'listar_libros'%}">Volver al listado</a>
   </div>
 </div>
