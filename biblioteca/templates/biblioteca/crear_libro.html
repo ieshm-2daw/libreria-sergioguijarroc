@@ -1,9 +1,10 @@
 {% extends "biblioteca/base.html" %} {%block title%}Crear libro {%endblock%} {%block content %}
 <div class="row">
   <div class="col">
-    <form action="" enctype="multipart/form-data" method="post">
-      {%csrf_token%} {{form.as_p}}
-      <input type="submit" value="Enviar" />
+    <form method="post">
+      {% csrf_token %}
+      {{form.as_p}}
+      <input type="submit" value="Guardar">
     </form>
   </div>
 </div>

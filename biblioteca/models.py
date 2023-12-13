@@ -39,9 +39,9 @@ class Libro(models.Model):
         ("P", "Prestado"),
         ("E", "En proceso de préstamo"),
     ]
-    disponibilidad = models.CharField(max_length=1, choices=DISPONIBILIDAD)
+    disponibilidad = models.CharField(max_length=1, choices=DISPONIBILIDAD, default="D")
     portada = models.ImageField(upload_to="portadas/", null=True, blank=True)
-    valoracion_media = models.FloatField(blank=True, null=True, default=0)
+    valoracion_media = models.FloatField(blank=True, null=True, default=None)
 
 
 class Editorial(models.Model):

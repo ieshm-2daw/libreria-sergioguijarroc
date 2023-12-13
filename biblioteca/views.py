@@ -33,8 +33,25 @@ class ListarLibros(ListView):
 class CrearLibro(CreateView):
     model = Libro
     template_name = "biblioteca/crear_libro.html"
-    fields = "__all__"
+    fields = [
+        "isbn",
+        "titulo",
+        "autor",
+        "editorial",
+        "fecha_publicacion",
+        "genero",
+        "resumen",
+        "portada",
+    ]
     success_url = reverse_lazy("listar_libros")
+
+
+"""
+class CrearLibro(View):
+    def get(self, request):
+        formulario = LibroForm()
+        return render(request, "biblioteca/crear_libro.html", {"libro": Libro()})
+"""
 
 
 class DetalleLibro(DetailView):
