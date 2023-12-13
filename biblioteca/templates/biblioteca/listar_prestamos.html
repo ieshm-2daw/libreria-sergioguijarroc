@@ -1,8 +1,20 @@
 {% extends "biblioteca/base.html" %} {%block title%} Libros {%endblock%} {%block content%}
 <div class="row">
   <div class="col">
-    <h2>Libros prestados:</h2>
+    <h2>Prestados actualmente:</h2>
     {%for prestamo in prestamos%}
+    <p>Libro: {{prestamo.libro_prestado.titulo}}</p>
+    <p>Fecha de prestamo: {{prestamo.fecha_prestamo}}</p>
+    <p>Fecha de devolucion: {{prestamo.fecha_devolucion}}</p>
+    <p>Usuario: {{prestamo.usuario}}</p>
+    <p>Estado: {{prestamo.estado_prestamo}}</p>
+    {%endfor%}
+  </div>
+</div>
+<div class="row">
+  <div class="col">
+    <h2>Historial Prestados</h2>
+    {%for prestamo in prestamo_historial%}
     <p>Libro: {{prestamo.libro_prestado.titulo}}</p>
     <p>Fecha de prestamo: {{prestamo.fecha_prestamo}}</p>
     <p>Fecha de devolucion: {{prestamo.fecha_devolucion}}</p>

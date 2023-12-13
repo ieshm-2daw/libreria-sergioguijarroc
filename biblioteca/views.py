@@ -65,7 +65,7 @@ class PrestarUnLibro(View):
         usuario = request.user  # Obtener el usuario actual
         libro.disponibilidad = "P"
         libro.save()
-        prestamo = Prestamo.objects.create(
+        Prestamo.objects.create(
             libro_prestado=libro,
             fecha_prestamo=datetime.now(),
             fecha_devolucion=None,
@@ -84,8 +84,13 @@ class ListarPrestamos(ListView):
             **kwargs
         )  # Esto es para que no se pise el contexto que ya tiene
         # context["prestamos"] = Prestamo.objects.all()
+
         context["prestamos"] = Prestamo.objects.filter(
-            usuario=self.request.user, estado_prestamo="P"
+            usuario=self.request.user, estado_prestamo="P", fecha_devolucion=None
+        )  # Pongo la fecha de devolución a None para que solo me devuelva los libros que no han sido devueltos todavía
+
+        context["prestamo_historial"] = Prestamo.objects.filter(
+            usuario=self.request.user, estado_prestamo="D"
         )
         return context
 
@@ -102,6 +107,7 @@ class ListarDevueltos(ListView):
         context["prestamos"] = Prestamo.objects.filter(
             usuario=self.request.user, estado_prestamo="D"
         )
+
         return context
 
 
@@ -115,7 +121,7 @@ class DevolverLibro(View):
         libro.disponibilidad = "D"
         libro.save()
         prestamo = Prestamo.objects.filter(
-            libro_prestado=libro, usuario=request.user
+            libro_prestado=libro, usuario=request.user, estado_prestamo="P"
         ).first()  # Esto es para que solo devuelva el primer objeto que encuentre, ya que puede haber varios prestamos del mismo libro
         prestamo.fecha_devolucion = datetime.now()
         prestamo.estado_prestamo = "D"
