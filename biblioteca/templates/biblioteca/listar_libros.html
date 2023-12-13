@@ -7,7 +7,7 @@
         <p>{{object.titulo}}</p>
         <p>{{object.autor}}</p>
         {%if object.portada%}
-        <img src="{{object.portada.url}}" alt="" />
+        <img class="img-fluid" src="{{object.portada.url}}" alt="" />
         {%endif%}
         <a href="{% url 'detalle_libro' object.pk %}">Detalles</a>
         <br />
@@ -21,7 +21,7 @@
         <p>{{object.titulo}}</p>
         <p>{{object.autor}}</p>
         {%if object.portada%}
-        <img src="{{object.portada.url}}" alt="" />
+        <img class="img-fluid" src="{{object.portada.url}}" alt="" />
         {%endif%}
         <br />
         <a href="{% url 'detalle_libro' object.pk %}">Detalles</a>

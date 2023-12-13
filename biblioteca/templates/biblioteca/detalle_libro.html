@@ -1,5 +1,4 @@
-{% extends "biblioteca/base.html" %} {%block title%} Libros {%endblock%} {%block
-content%}
+{% extends "biblioteca/base.html" %} {%block title%} Libros {%endblock%} {%block content%}
 
 <div class="row">
   <div class="col">
@@ -12,12 +11,13 @@ content%}
     <p>resumen: {{object.resumen}}</p>
     <p>disponibilidad: {{object.disponibilidad}}</p>
     {%if object.portada%} #Portada es el nombre del atributo de imagen
-    <img src="{{object.portada.url}}" alt="" />
+    <img class="img-fluid" src="{{object.portada.url}}" alt="" />
     {%endif%}
     <a href="{% url 'editar_libro' object.pk %}">Editar este libro</a>
     <a href="{% url 'eliminar_libro' object.pk %}">Eliminar este libro</a>
     <a href="{% url 'prestar_libro' object.pk %}">Prestar este libro</a>
     <a href="{% url 'devolver_libro' object.pk %}">Devolver este libro</a>
+    <a href="{%url 'listar_libros'%}">Volver al listado</a>
   </div>
 </div>
 

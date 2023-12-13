@@ -56,7 +56,7 @@ class EliminarLibro(DeleteView):
 
 class PrestarUnLibro(View):
     def get(self, request, pk):
-        libro = Libro.objects.get(pk=pk)
+        libro = Libro.objects.filter(pk=pk, disponibilidad="D").first()
         # También se puede hacer con libro = get_object_or_404(Libro, pk=pk)
         return render(request, "biblioteca/prestar_libro.html", {"libro": libro})
 
@@ -83,7 +83,10 @@ class ListarPrestamos(ListView):
         context = super().get_context_data(
             **kwargs
         )  # Esto es para que no se pise el contexto que ya tiene
-        context["prestamos"] = Prestamo.objects.all()
+        # context["prestamos"] = Prestamo.objects.all()
+        context["prestamos"] = Prestamo.objects.filter(
+            usuario=self.request.user, estado_prestamo="P"
+        )
         return context
 
 
@@ -95,22 +98,25 @@ class ListarDevueltos(ListView):
         context = super().get_context_data(
             **kwargs
         )  # Esto es para que no se pise el contexto que ya tiene
-        context["prestamos"] = Prestamo.objects.all()
+        # context["prestamos"] = Prestamo.objects.all()
+        context["prestamos"] = Prestamo.objects.filter(
+            usuario=self.request.user, estado_prestamo="D"
+        )
         return context
 
 
 class DevolverLibro(View):
     def get(self, request, pk):
-        libro = Libro.objects.get(pk=pk)
+        libro = Libro.objects.filter(pk=pk, disponibilidad="P").first()
         return render(request, "biblioteca/devolver_libro.html", {"libro": libro})
 
     def post(self, request, pk):
-        libro = get_object_or_404(Libro, pk=pk)
+        libro = get_object_or_404(Libro, pk=pk, disponibilidad="P")
         libro.disponibilidad = "D"
         libro.save()
         prestamo = Prestamo.objects.filter(
             libro_prestado=libro, usuario=request.user
-        ).first()
+        ).first()  # Esto es para que solo devuelva el primer objeto que encuentre, ya que puede haber varios prestamos del mismo libro
         prestamo.fecha_devolucion = datetime.now()
         prestamo.estado_prestamo = "D"
         prestamo.save()

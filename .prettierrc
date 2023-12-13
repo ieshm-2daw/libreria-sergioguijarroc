@@ -1,12 +1,13 @@
 {
-    "overrides": [
-      {
-        "files": ["*.html"],
-        "options": {
-          "parser": "html",
-          "htmlWhitespaceSensitivity": "ignore"
-        }
+  "overrides": [
+    {
+      "files": [
+        "*.html"
+      ],
+      "options": {
+        "parser": "html",
+        "htmlWhitespaceSensitivity": "ignore"
       }
-    ]
-  }
-  
+    }
+  ]
+}
