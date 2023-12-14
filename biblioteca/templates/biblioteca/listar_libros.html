@@ -3,33 +3,34 @@
     <div class="col-12">
         <h2>Libros disponibles</h2>
         {%for object in libros_disponibles%}
-        <p>{{object.isbn}}</p>
-        <p>{{object.titulo}}</p>
-        <p>{{object.autor}}</p>
+        <h4 class="mt-5">Título: {{object.titulo}}</h4>
+        <p>ISBN: {{object.isbn}}</p>        
+        <p>Autor: {{object.autor}}</p>
         {%if object.portada%}
         <img class="img-fluid" src="{{object.portada.url}}" alt="" />
         {%endif%}
-        <a href="{% url 'detalle_libro' object.pk %}">Detalles</a>
+        <br />
+        <a href="{% url 'detalle_libro' object.pk %}">Más detalles del libro</a>
         <br />
         {%endfor%}
     </div>
 
-    <div class="col-12">
+    <div class="col-12 mt-5">
         <h2>Libros no disponibles</h2>
         {%for object in libros_prestados%}
-        <p>{{object.isbn}}</p>
-        <p>{{object.titulo}}</p>
-        <p>{{object.autor}}</p>
+        <h4 class="mt-5">Título: {{object.titulo}}</h4>
+        <p>ISBN: {{object.isbn}}</p>    
+        <p>Autor: {{object.autor}}</p>
         {%if object.portada%}
         <img class="img-fluid" src="{{object.portada.url}}" alt="" />
         {%endif%}
         <br />
-        <a href="{% url 'detalle_libro' object.pk %}">Detalles</a>
+        <a href="{% url 'detalle_libro' object.pk %}">Más detalles del libro</a>
         <br />
         {%endfor%}
 
     </div>
-    <div class="row">
+    <div class="row mt-5">
         <div class="col">
             <input type="button" value="Crear un libro" onclick="location.href='{%url 'crear_libro'%}'" />
 

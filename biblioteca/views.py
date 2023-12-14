@@ -158,13 +158,16 @@ class ValoracionLibro(View):
         valoracionUsuario = float(request.POST["valoracion"])
         libro.numero_valoraciones += 1
 
+        if valoracionLibroMedia is None:
+            valoracionLibroMedia = 0
+
         if libro.numero_valoraciones > 0:
             libro.valoracion_media = (
                 valoracionLibroMedia * (libro.numero_valoraciones - 1)
                 + valoracionUsuario
             ) / libro.numero_valoraciones
         else:
-            libro.numero_valoraciones = valoracionUsuario
+            libro.valoracion_media = valoracionUsuario
 
         libro.save()
         return redirect("detalle_libro", pk=libro.pk)
