@@ -9,7 +9,7 @@ class Usuario(AbstractUser):
     telefono = models.IntegerField(
         validators=[MaxValueValidator(9)], null=True, blank=True
     )
-    prestamo = models.ForeignKey(
+    prestamo_actual = models.ForeignKey(
         "Prestamo",
         on_delete=models.CASCADE,
         blank=True,
@@ -64,3 +64,5 @@ class Prestamo(models.Model):
         ("P", "Prestado"),
     ]
     estado_prestamo = models.CharField(max_length=1, choices=DISPONIBILIDAD)
+    valoracion_usuario = models.IntegerField(default=0)
+    numero_valoraciones = models.IntegerField(default=0)

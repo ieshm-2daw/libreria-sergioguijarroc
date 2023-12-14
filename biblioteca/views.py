@@ -74,7 +74,7 @@ class EliminarLibro(DeleteView):
 
 class PrestarUnLibro(View):
     def get(self, request, pk):
-        libro = Libro.objects.filter(pk=pk, disponibilidad="D").first()
+        libro = get_object_or_404(Libro, pk=pk, disponibilidad="D")
         # También se puede hacer con libro = get_object_or_404(Libro, pk=pk)
         return render(request, "biblioteca/prestar_libro.html", {"libro": libro})
 
@@ -89,6 +89,8 @@ class PrestarUnLibro(View):
             fecha_devolucion=None,
             usuario=usuario,  # Asignar el usuario al objeto Prestamo
             estado_prestamo="P",
+            valoracion_usuario=0,
+            numero_valoraciones=0,
         )
         return redirect("detalle_libro", pk=libro.pk)
 
@@ -136,17 +138,19 @@ class DevolverLibro(View):
 
     def post(self, request, pk):
         libro = get_object_or_404(Libro, pk=pk, disponibilidad="P")
-        libro.disponibilidad = "D"
-        libro.save()
         prestamo = Prestamo.objects.filter(
             libro_prestado=libro, usuario=request.user, estado_prestamo="P"
         ).first()  # Esto es para que solo devuelva el primer objeto que encuentre, ya que puede haber varios prestamos del mismo libro
+        libro.disponibilidad = "D"
+        libro.save()
+
         prestamo.fecha_devolucion = datetime.now()
         prestamo.estado_prestamo = "D"
         prestamo.save()
         return redirect("detalle_libro", pk=libro.pk)
 
 
+"""
 class ValoracionLibro(View):
     def get(self, request, pk):
         libro = Libro.objects.get(pk=pk)
@@ -154,6 +158,41 @@ class ValoracionLibro(View):
 
     def post(self, request, pk):
         libro = Libro.objects.get(pk=pk)
+        valoracionLibroMedia = libro.valoracion_media
+        valoracionUsuario = float(request.POST["valoracion"])
+        libro.numero_valoraciones += 1
+
+        if valoracionLibroMedia is None:
+            valoracionLibroMedia = 0
+
+        if libro.numero_valoraciones > 0:
+            libro.valoracion_media = (
+                valoracionLibroMedia * (libro.numero_valoraciones - 1)
+                + valoracionUsuario
+            ) / libro.numero_valoraciones
+        else:
+            libro.valoracion_media = valoracionUsuario
+
+        libro.save()
+        return redirect("detalle_libro", pk=libro.pk)
+"""
+
+
+class ValoracionLibro(View):
+    def get(self, request, pk):
+        prestamo = get_object_or_404(
+            Prestamo,
+            pk=pk,
+        )
+        return render(
+            request,
+            "biblioteca/valoracion_libro2.html",
+            {"prestamo": prestamo},
+        )
+
+    def post(self, request, pk):
+        prestamo = Prestamo.objects.get(pk=pk)
+        libro = prestamo.libro_prestado
         valoracionLibroMedia = libro.valoracion_media
         valoracionUsuario = float(request.POST["valoracion"])
         libro.numero_valoraciones += 1

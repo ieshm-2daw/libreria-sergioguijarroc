@@ -1,0 +1,24 @@
+{% extends "biblioteca/base.html" %}
+{%block title%}Valoración{%endblock%}
+{%block content%}
+
+<div class="row">
+    <div class="col">
+        <h2>Valoración del libro {{prestamo.libro.nombre}}</h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="valoracion">Valoración</label>
+                <input type="number" class="form-control" id="valoracion" name="valoracion" min="0" max="10"
+                    placeholder="Valoración" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+    </div>
+</div>
+
+{%endblock%}
