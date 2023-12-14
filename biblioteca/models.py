@@ -44,6 +44,17 @@ class Libro(models.Model):
     valoracion_media = models.FloatField(blank=True, null=True, default=None)
     numero_valoraciones = models.IntegerField(default=0)
 
+    def actualizar_valoracion_media(self, nueva_valoracion):
+        if self.numero_valoraciones > 0:  # Si ya hay valoraciones, se calcula la media
+            self.valoracion_media = (
+                (self.valoracion_media * (self.numero_valoraciones - 1))
+                + nueva_valoracion
+            ) / self.numero_valoraciones
+        else:  # Si no hay valoraciones, se asigna la primera
+            self.valoracion_media = nueva_valoracion
+
+        self.numero_valoraciones += 1
+
 
 class Editorial(models.Model):
     nombre = models.CharField(max_length=15)

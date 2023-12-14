@@ -193,21 +193,22 @@ class ValoracionLibro(View):
         libro = Libro.objects.get(pk=prestamo.libro_prestado.pk)
         valoracionUsuario = float(request.POST["valoracion"])
 
-        if prestamo.valoracion_usuario == None:
-            if libro.numero_valoraciones > 0:
+        if prestamo.usuario == request.user and prestamo.estado_prestamo == "P":
+            # Si las condiciones se cumplen, eliminamos la valoración anterior si vemos que existe
+            if prestamo.valoracion_usuario is not None:
+                libro.numero_valoraciones -= 1
                 libro.valoracion_media = (
-                    libro.valoracion_media * (libro.numero_valoraciones)
-                    + valoracionUsuario
-                ) / libro.numero_valoraciones
-            else:
-                libro.valoracion_media = valoracionUsuario
-            libro.numero_valoraciones += 1
-        else:
-            libro.valoracion_media = (
-                libro.valoracion_media * (libro.numero_valoraciones)
-                - prestamo.valoracion_usuario  # Le quitamos la valoración anterior del usuario
-            ) + valoracionUsuario  # Le añadimos la valoración actual
-        prestamo.valoracion_usuario = valoracionUsuario
-        libro.save()
-        prestamo.save()
+                    libro.valoracion_media * libro.numero_valoraciones
+                    - prestamo.valoracion_usuario
+                ) / max(
+                    1, libro.numero_valoraciones
+                )  # Esto lo que hace es que nunca sea 0 el denominador, para que no casque.
+                # Este caso se puede dar si, por ejemplo, sobreescribo una valoración del mismo usuario y el libro sólo tiene una, ya que con libro.numero_valoraciones-= 1 lo dejaría a 0
+
+            # En todos los casos, vamos a agregar la valoración, ya sea si existía antes o no
+            prestamo.valoracion_usuario = valoracionUsuario
+            libro.actualizar_valoracion_media(valoracionUsuario)
+            libro.save()
+            prestamo.save()
+
         return redirect("detalle_libro", pk=libro.pk)
