@@ -8,6 +8,7 @@
     <p>Fecha de devolucion: {{prestamo.fecha_devolucion}}</p>
     <p>Usuario: {{prestamo.usuario}}</p>
     <p>Estado: {{prestamo.estado_prestamo}}</p>
+    <p>Dejar una review de este libro: <a href="{%url 'valoracion_libro' prestamo.pk %}">Aquí</a></p>
     {%endfor%}
   </div>
 </div>

@@ -64,5 +64,5 @@ class Prestamo(models.Model):
         ("P", "Prestado"),
     ]
     estado_prestamo = models.CharField(max_length=1, choices=DISPONIBILIDAD)
-    valoracion_usuario = models.IntegerField(default=0)
-    numero_valoraciones = models.IntegerField(default=0)
+    valoracion_usuario = models.FloatField(blank=True, null=True, default=None)
+    numero_valoraciones = models.IntegerField(blank=True, null=True, default=0)
