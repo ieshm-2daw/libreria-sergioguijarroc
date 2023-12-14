@@ -190,23 +190,24 @@ class ValoracionLibro(View):
 
     def post(self, request, pk):
         prestamo = Prestamo.objects.get(pk=pk)
-        libro = prestamo.libro_prestado
+        libro = Libro.objects.get(pk=prestamo.libro_prestado.pk)
         valoracionUsuario = float(request.POST["valoracion"])
-        libro.numero_valoraciones += 1
 
         if prestamo.valoracion_usuario == None:
             if libro.numero_valoraciones > 0:
                 libro.valoracion_media = (
-                    libro.valoracion_media * (libro.numero_valoraciones - 1)
+                    libro.valoracion_media * (libro.numero_valoraciones)
                     + valoracionUsuario
                 ) / libro.numero_valoraciones
             else:
                 libro.valoracion_media = valoracionUsuario
+            libro.numero_valoraciones += 1
         else:
             libro.valoracion_media = (
-                libro.valoracion_media * (libro.numero_valoraciones - 1)
+                libro.valoracion_media * (libro.numero_valoraciones)
                 - prestamo.valoracion_usuario  # Le quitamos la valoración anterior del usuario
             ) + valoracionUsuario  # Le añadimos la valoración actual
-
-            libro.save()
+        prestamo.valoracion_usuario = valoracionUsuario
+        libro.save()
+        prestamo.save()
         return redirect("detalle_libro", pk=libro.pk)
