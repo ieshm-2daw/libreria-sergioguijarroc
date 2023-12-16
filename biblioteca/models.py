@@ -75,5 +75,16 @@ class Prestamo(models.Model):
         ("P", "Prestado"),
     ]
     estado_prestamo = models.CharField(max_length=1, choices=DISPONIBILIDAD)
-    valoracion_usuario = models.FloatField(blank=True, null=True, default=None)
-    numero_valoraciones = models.IntegerField(blank=True, null=True, default=0)
+    # valoracion_usuario = models.FloatField(blank=True, null=True, default=None)
+    # numero_valoraciones = models.IntegerField(blank=True, null=True, default=0)
+    valoracion_usuario = models.OneToOneField(
+        "Valoraciones", on_delete=models.CASCADE, null=True, blank=True
+    )
+
+
+class Valoraciones(models.Model):
+    valoracion = models.FloatField()
+    usuario = models.OneToOneField(
+        Usuario, on_delete=models.CASCADE
+    )  # Django me recomendaba usar OneToOneField en vez de ForeignKey porque solo hay una valoración por usuario
+    prestamo = models.OneToOneField(Prestamo, on_delete=models.CASCADE)

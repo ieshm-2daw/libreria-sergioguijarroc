@@ -175,7 +175,7 @@ class ValoracionLibro(View):
         return redirect("detalle_libro", pk=libro.pk)
 """
 
-
+"""
 class ValoracionLibro(View):
     def get(self, request, pk):
         prestamo = get_object_or_404(
@@ -204,11 +204,56 @@ class ValoracionLibro(View):
                     1, libro.numero_valoraciones
                 )  # Esto lo que hace es que nunca sea 0 el denominador, para que no casque.
                 # Este caso se puede dar si, por ejemplo, sobreescribo una valoración del mismo usuario y el libro sólo tiene una, ya que con libro.numero_valoraciones-= 1 lo dejaría a 0
-
             # En todos los casos, vamos a agregar la valoración, ya sea si existía antes o no
             prestamo.valoracion_usuario = valoracionUsuario
             libro.actualizar_valoracion_media(valoracionUsuario)
             libro.save()
             prestamo.save()
 
+        return redirect("detalle_libro", pk=libro.pk)
+
+"""
+
+
+# models.py
+class Valoraciones(models.Model):
+    valoracion = models.FloatField()
+    usuario = models.OneToOneField(
+        Usuario, on_delete=models.CASCADE
+    )  # Django me recomendaba usar OneToOneField en vez de ForeignKey porque solo hay una valoración por usuario
+    prestamo = models.OneToOneField(Prestamo, on_delete=models.CASCADE)
+
+
+class ValoracionLibro(View):
+    def get(self, request, pk):
+        prestamo = get_object_or_404(
+            Prestamo,
+            pk=pk,
+        )
+        return render(
+            request,
+            "biblioteca/valoracion_libro2.html",
+            {"prestamo": prestamo},
+        )
+
+    def post(self, request, pk):
+        prestamo = get_object_or_404(Prestamo, pk=pk)
+        libro = Libro.objects.get(pk=prestamo.libro_prestado.pk)
+        valoracionUsuario = float(request.POST["valoracion"])
+
+        if prestamo.valoracion_usuario is None:
+            libro.numero_valoraciones += 1
+            libro.valoracion_media = (
+                libro.valoracion_media * (libro.numero_valoraciones - 1)
+                + valoracionUsuario
+            ) / libro.numero_valoraciones
+        else:
+            libro.valoracion_media = (
+                libro.valoracion_media * libro.numero_valoraciones
+                - prestamo.valoracion_usuario
+                + valoracionUsuario
+            ) / libro.numero_valoraciones
+        libro.save()
+        prestamo.valoracion_usuario = valoracionUsuario
+        prestamo.save()
         return redirect("detalle_libro", pk=libro.pk)
