@@ -82,6 +82,9 @@ class Prestamo(models.Model):
     )
 
 
+# Cambios últimos
+
+
 class Valoraciones(models.Model):
     valoracion = models.FloatField()
     usuario = models.OneToOneField(
