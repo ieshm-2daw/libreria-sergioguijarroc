@@ -63,6 +63,7 @@ class Editorial(models.Model):
     # libros = models.ForeignKey(Libro, blank=True, on_delete=models.CASCADE)  # No es necesario tener esta relación aquí
 
 
+# Cambios
 class Prestamo(models.Model):
     libro_prestado = models.ForeignKey(Libro, on_delete=models.CASCADE)
     fecha_prestamo = models.DateField()
