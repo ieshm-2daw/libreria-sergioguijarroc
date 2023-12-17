@@ -1,4 +1,6 @@
 from datetime import datetime
+from typing import Any
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse_lazy
 from django.views.generic import (
@@ -8,8 +10,10 @@ from django.views.generic import (
     UpdateView,
     DeleteView,
 )
-from .models import Libro, Prestamo
+from .models import Libro, Prestamo, Valoracion
 from django.views import View
+from .forms import ValoracionForm
+from django.db.models import Avg
 
 # Create your views here.
 
@@ -49,6 +53,19 @@ class CrearLibro(CreateView):
 class DetalleLibro(DetailView):
     template_name = "biblioteca/detalle_libro.html"
     model = Libro
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Asegúrate de tener el objeto Libro en el contexto
+        libro = context.get("object")
+
+        # Asegúrate de calcular la valoración media
+        if libro:
+            libro.actualizar_valoracion_media()
+            context["libro"] = libro
+
+        return context
 
 
 class EditarLibro(UpdateView):
@@ -91,26 +108,6 @@ class PrestarUnLibro(View):
             estado_prestamo="P",
         )
         return redirect("detalle_libro", pk=libro.pk)
-
-
-class ListarPrestamos(ListView):
-    model = Prestamo
-    template_name = "biblioteca/listar_prestamos.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(
-            **kwargs
-        )  # Esto es para que no se pise el contexto que ya tiene
-        # context["prestamos"] = Prestamo.objects.all()
-
-        context["prestamos"] = Prestamo.objects.filter(
-            usuario=self.request.user, estado_prestamo="P", fecha_devolucion=None
-        )  # Pongo la fecha de devolución a None para que solo me devuelva los libros que no han sido devueltos todavía
-
-        context["prestamo_historial"] = Prestamo.objects.filter(
-            usuario=self.request.user, estado_prestamo="D"
-        )
-        return context
 
 
 class ListarDevueltos(ListView):
@@ -176,6 +173,19 @@ class ValoracionLibro(View):
 """
 
 
+def valoracion_libro(request, pk, valoracion) -> HttpResponse:
+    prestamo = Prestamo.objects.get(pk=pk)
+    libro = Libro.objects.get(pk=prestamo.libro_prestado.pk)
+
+    Valoracion.objects.filter(
+        usuario=request.user, prestamo=prestamo
+    ).delete()  # Esto es para que si el usuario ya había valorado el libro, se elimine la valoración anterior
+    libro.valoracion_set.create(
+        usuario=request.user, valoracion=valoracion, prestamo=prestamo
+    )  # Esto es para que se cree una nueva valoración
+    return redirect("detalle_libro", pk=libro.pk)
+
+
 class ValoracionLibro(View):
     def get(self, request, pk):
         prestamo = get_object_or_404(
@@ -194,8 +204,29 @@ class ValoracionLibro(View):
         valoracionUsuario = float(request.POST["valoracion"])
 
         if prestamo.usuario == request.user and prestamo.estado_prestamo == "P":
-            # Si las condiciones se cumplen, eliminamos la valoración anterior si vemos que existe
             if prestamo.valoracion_usuario is not None:
+                """
+                #Esto no funciona ya que si borro la valoración, luego no puedo enlazar la nueva valoración con el prestamo
+                prestamo.valoracion_usuario.delete() # Esto es para que si el usuario ya había valorado el libro, se elimine la valoración anterior
+                """
+                prestamo.valoracion_usuario.actualizar_rating(valoracionUsuario)
+                prestamo.valoracion_usuario.save()
+                prestamo.save()
+            else:
+                valoracion = Valoracion.objects.create(
+                    prestamo_valoracion=prestamo,
+                    usuario_valoracion=request.user,
+                    rating=valoracionUsuario,
+                )
+                prestamo.valoracion_usuario = valoracion
+                prestamo.save()
+                valoracion.save()
+
+            libro.actualizar_valoracion_media()
+            libro.save()
+
+            # Si las condiciones se cumplen, eliminamos la valoración anterior si vemos que existe
+            """if prestamo.valoracion_usuario is not None:
                 libro.numero_valoraciones -= 1
                 libro.valoracion_media = (
                     libro.valoracion_media * libro.numero_valoraciones
@@ -204,11 +235,38 @@ class ValoracionLibro(View):
                     1, libro.numero_valoraciones
                 )  # Esto lo que hace es que nunca sea 0 el denominador, para que no casque.
                 # Este caso se puede dar si, por ejemplo, sobreescribo una valoración del mismo usuario y el libro sólo tiene una, ya que con libro.numero_valoraciones-= 1 lo dejaría a 0
-
+            
+                
             # En todos los casos, vamos a agregar la valoración, ya sea si existía antes o no
             prestamo.valoracion_usuario = valoracionUsuario
             libro.actualizar_valoracion_media(valoracionUsuario)
             libro.save()
             prestamo.save()
+            """
 
         return redirect("detalle_libro", pk=libro.pk)
+
+
+class ListarPrestamos(ListView):
+    model = Prestamo
+    template_name = "biblioteca/listar_prestamos.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        prestamos_usuario_actual = Prestamo.objects.filter(
+            estado_prestamo="P", usuario=self.request.user, fecha_devolucion=None
+        )
+
+        context["prestamos"] = prestamos_usuario_actual
+        context["prestamo_historial"] = Prestamo.objects.filter(
+            usuario=self.request.user, estado_prestamo="D"
+        )
+
+        return context
+
+
+def añadir_review(request, pk):
+    prestamo = Prestamo.objects.get(pk=pk)
+    libro = Libro.objects.get(pk=prestamo.libro_prestado.pk)
+    user = request.user

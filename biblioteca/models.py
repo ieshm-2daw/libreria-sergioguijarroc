@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator
+from django.db.models import Avg
 
 
 class Usuario(AbstractUser):
@@ -44,16 +45,21 @@ class Libro(models.Model):
     valoracion_media = models.FloatField(blank=True, null=True, default=None)
     numero_valoraciones = models.IntegerField(default=0)
 
-    def actualizar_valoracion_media(self, nueva_valoracion):
-        if self.numero_valoraciones > 0:  # Si ya hay valoraciones, se calcula la media
-            self.valoracion_media = (
-                (self.valoracion_media * (self.numero_valoraciones - 1))
-                + nueva_valoracion
-            ) / self.numero_valoraciones
-        else:  # Si no hay valoraciones, se asigna la primera
-            self.valoracion_media = nueva_valoracion
+    def actualizar_valoracion_media(self):
+        # Obtener todas las valoraciones asociadas al libro
+        reviews = Valoracion.objects.filter(prestamo_valoracion__libro_prestado=self)
 
-        self.numero_valoraciones += 1
+        # Calcular el promedio de las valoraciones
+        avg_rating = reviews.aggregate(Avg("rating"))["rating__avg"]
+        # Actualizar la valoración media del libro
+        if avg_rating is not None:
+            self.valoracion_media = avg_rating
+        else:
+            # Si no hay valoraciones, establece la media en 0 o cualquier otro valor predeterminado
+            self.valoracion_media = 0  # Puedes cambiar esto según tus necesidades
+
+        # Guardar el libro actualizado
+        self.save()
 
 
 class Editorial(models.Model):
@@ -76,5 +82,20 @@ class Prestamo(models.Model):
         ("P", "Prestado"),
     ]
     estado_prestamo = models.CharField(max_length=1, choices=DISPONIBILIDAD)
-    valoracion_usuario = models.FloatField(blank=True, null=True, default=None)
+    # valoracion_usuario = models.FloatField(blank=True, null=True, default=None)
+    valoracion_usuario = models.OneToOneField(
+        "Valoracion", on_delete=models.CASCADE, null=True, blank=True, default=None
+    )
     numero_valoraciones = models.IntegerField(blank=True, null=True, default=0)
+
+
+class Valoracion(models.Model):
+    prestamo_valoracion = models.OneToOneField(Prestamo, on_delete=models.CASCADE)
+    usuario_valoracion = models.ForeignKey(
+        Usuario,
+        on_delete=models.CASCADE,
+    )
+    rating = models.FloatField(null=True, blank=True, default=None)
+
+    def actualizar_rating(self, rating):
+        self.rating = rating
