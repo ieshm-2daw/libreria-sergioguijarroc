@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
@@ -89,7 +89,7 @@ class PrestarUnLibro(View):
         Prestamo.objects.create(
             libro_prestado=libro,
             fecha_prestamo=datetime.now(),
-            fecha_devolucion=None,
+            fecha_devolucion=datetime.now() + timedelta(days=15),
             usuario=usuario,  # Asignar el usuario al objeto Prestamo
             estado_prestamo="P",
         )
@@ -196,3 +196,34 @@ class ListarPrestamos(ListView):
         )
 
         return context
+
+
+class PanelBibliotecario(ListView):
+    model = Prestamo
+    template_name = "biblioteca/panel_bibliotecario.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        if self.request.user.get_username() == "bibliotecario":
+            numeroLibrosPrestados = Prestamo.objects.filter(estado_prestamo="P").count()
+            numeroLibrosDisponibles = Libro.objects.filter(disponibilidad="D").count()
+            librosNoDevueltos = Prestamo.objects.filter(
+                fecha_devolucion__lt=datetime.now()
+            )
+
+            librosProximosADevolver = Prestamo.objects.filter(
+                fecha_devolucion__gt=datetime.now()
+            )
+
+            top3MejoresLibros = Libro.objects.order_by("-valoracion_media")[
+                :3
+            ]  # Ordena los libros de mayor a menor valoración y coge los 3 primeros
+
+            context["numeroLibrosPrestados"] = numeroLibrosPrestados
+            context["numeroLibrosDisponibles"] = numeroLibrosDisponibles
+            context["librosNoDevueltos"] = librosNoDevueltos
+            context["librosProximosADevolver"] = librosProximosADevolver
+            context["top3MejoresLibros"] = top3MejoresLibros
+
+            return context

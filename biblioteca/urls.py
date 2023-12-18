@@ -9,6 +9,7 @@ from .views import (
     ListarDevueltos,
     DevolverLibro,
     ValoracionLibro,
+    PanelBibliotecario,
 )
 from django.urls import path
 
@@ -23,4 +24,7 @@ urlpatterns = [
     path("devueltos/", ListarDevueltos.as_view(), name="listar_devueltos"),
     path("devolver/<int:pk>", DevolverLibro.as_view(), name="devolver_libro"),
     path("valoracion/<int:pk>", ValoracionLibro.as_view(), name="valoracion_libro"),
+    path(
+        "panelBibliotecario/", PanelBibliotecario.as_view(), name="panel_bibliotecario"
+    ),
 ]

@@ -1,0 +1,35 @@
+{%extends "biblioteca/base.html"%} {%block title%} Panel Bibliotecario {%endblock%} {%block content%}
+
+<h2 class="my-5">Panel del bibliotecario:</h2>
+
+<div class="row">
+    <div class="col">
+        <h4>Número de libros prestados: </h4><span>{{numeroLibrosPrestados}}</span>
+        <h4>Número de libros disponibles: </h4><span>{{numeroLibrosDisponibles}}</span>
+
+
+
+
+    </div>
+    <div class="col">
+        <h4>Libros no devueltos:</h4>
+        {%for prestamo in librosNoDevueltos%}
+            Título: {{prestamo.libro_prestado.titulo}}
+            Moroso: {{prestamo.usuario}}
+        {%endfor%}
+    </div>
+    <div class="col">
+        {%for prestamo in librosProximosADevolver%}
+        Título: {{prestamo.libro_prestado.titulo}}
+        Usuario que tiene el libro: {{prestamo.usuario}}
+    {%endfor%}
+    </div>
+    <div class="col">
+        {%for libro in top3MejoresLibros%}
+        Título: {{libro.titulo}}
+        Puntuación media: {{libro.valoracion_media}}
+    {%endfor%}
+    </div>
+</div>
+
+{%endblock%}

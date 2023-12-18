@@ -38,7 +38,6 @@ class Libro(models.Model):
     DISPONIBILIDAD = [
         ("D", "Disponible"),
         ("P", "Prestado"),
-        ("E", "En proceso de préstamo"),
     ]
     disponibilidad = models.CharField(max_length=1, choices=DISPONIBILIDAD, default="D")
     portada = models.ImageField(upload_to="portadas/", null=True, blank=True)
@@ -74,7 +73,7 @@ class Prestamo(models.Model):
         Usuario, on_delete=models.CASCADE, related_name="prestamos_usuario"
     )  # Related name es para que no se pise con el nombre de la clase y se pueda acceder a los prestamos de un usuario
     DISPONIBILIDAD = [
-        ("D", "Disponible"),
+        ("D", "Devuelto"),
         ("P", "Prestado"),
     ]
     estado_prestamo = models.CharField(max_length=1, choices=DISPONIBILIDAD)
