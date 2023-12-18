@@ -12,7 +12,6 @@ from django.views.generic import (
 )
 from .models import Libro, Prestamo, Valoracion
 from django.views import View
-from .forms import ValoracionForm
 from django.db.models import Avg
 
 # Create your views here.
@@ -53,19 +52,6 @@ class CrearLibro(CreateView):
 class DetalleLibro(DetailView):
     template_name = "biblioteca/detalle_libro.html"
     model = Libro
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        # Asegúrate de tener el objeto Libro en el contexto
-        libro = context.get("object")
-
-        # Asegúrate de calcular la valoración media
-        if libro:
-            libro.actualizar_valoracion_media()
-            context["libro"] = libro
-
-        return context
 
 
 class EditarLibro(UpdateView):
@@ -145,47 +131,6 @@ class DevolverLibro(View):
         return redirect("detalle_libro", pk=libro.pk)
 
 
-"""
-class ValoracionLibro(View):
-    def get(self, request, pk):
-        libro = Libro.objects.get(pk=pk)
-        return render(request, "biblioteca/valoracion_libro.html", {"libro": libro})
-
-    def post(self, request, pk):
-        libro = Libro.objects.get(pk=pk)
-        valoracionLibroMedia = libro.valoracion_media
-        valoracionUsuario = float(request.POST["valoracion"])
-        libro.numero_valoraciones += 1
-
-        if valoracionLibroMedia is None:
-            valoracionLibroMedia = 0
-
-        if libro.numero_valoraciones > 0:
-            libro.valoracion_media = (
-                valoracionLibroMedia * (libro.numero_valoraciones - 1)
-                + valoracionUsuario
-            ) / libro.numero_valoraciones
-        else:
-            libro.valoracion_media = valoracionUsuario
-
-        libro.save()
-        return redirect("detalle_libro", pk=libro.pk)
-"""
-
-
-def valoracion_libro(request, pk, valoracion) -> HttpResponse:
-    prestamo = Prestamo.objects.get(pk=pk)
-    libro = Libro.objects.get(pk=prestamo.libro_prestado.pk)
-
-    Valoracion.objects.filter(
-        usuario=request.user, prestamo=prestamo
-    ).delete()  # Esto es para que si el usuario ya había valorado el libro, se elimine la valoración anterior
-    libro.valoracion_set.create(
-        usuario=request.user, valoracion=valoracion, prestamo=prestamo
-    )  # Esto es para que se cree una nueva valoración
-    return redirect("detalle_libro", pk=libro.pk)
-
-
 class ValoracionLibro(View):
     def get(self, request, pk):
         prestamo = get_object_or_404(
@@ -203,11 +148,17 @@ class ValoracionLibro(View):
         libro = Libro.objects.get(pk=prestamo.libro_prestado.pk)
         valoracionUsuario = float(request.POST["valoracion"])
 
-        if prestamo.usuario == request.user and prestamo.estado_prestamo == "P":
+        if (
+            prestamo.usuario == request.user
+            and prestamo.estado_prestamo
+            == "D"  # Simplemente cambiando esto a "P" se puede valorar un libro que tiene prestado el usuario actualmente
+            and valoracionUsuario >= 0
+            and valoracionUsuario <= 10
+        ):
             if prestamo.valoracion_usuario is not None:
                 """
                 #Esto no funciona ya que si borro la valoración, luego no puedo enlazar la nueva valoración con el prestamo
-                prestamo.valoracion_usuario.delete() # Esto es para que si el usuario ya había valorado el libro, se elimine la valoración anterior
+                prestamo.valoracion_usuario.delete()
                 """
                 prestamo.valoracion_usuario.actualizar_rating(valoracionUsuario)
                 prestamo.valoracion_usuario.save()
@@ -224,25 +175,6 @@ class ValoracionLibro(View):
 
             libro.actualizar_valoracion_media()
             libro.save()
-
-            # Si las condiciones se cumplen, eliminamos la valoración anterior si vemos que existe
-            """if prestamo.valoracion_usuario is not None:
-                libro.numero_valoraciones -= 1
-                libro.valoracion_media = (
-                    libro.valoracion_media * libro.numero_valoraciones
-                    - prestamo.valoracion_usuario
-                ) / max(
-                    1, libro.numero_valoraciones
-                )  # Esto lo que hace es que nunca sea 0 el denominador, para que no casque.
-                # Este caso se puede dar si, por ejemplo, sobreescribo una valoración del mismo usuario y el libro sólo tiene una, ya que con libro.numero_valoraciones-= 1 lo dejaría a 0
-            
-                
-            # En todos los casos, vamos a agregar la valoración, ya sea si existía antes o no
-            prestamo.valoracion_usuario = valoracionUsuario
-            libro.actualizar_valoracion_media(valoracionUsuario)
-            libro.save()
-            prestamo.save()
-            """
 
         return redirect("detalle_libro", pk=libro.pk)
 
@@ -264,9 +196,3 @@ class ListarPrestamos(ListView):
         )
 
         return context
-
-
-def añadir_review(request, pk):
-    prestamo = Prestamo.objects.get(pk=pk)
-    libro = Libro.objects.get(pk=prestamo.libro_prestado.pk)
-    user = request.user

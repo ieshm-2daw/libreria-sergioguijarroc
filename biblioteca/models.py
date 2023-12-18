@@ -43,22 +43,18 @@ class Libro(models.Model):
     disponibilidad = models.CharField(max_length=1, choices=DISPONIBILIDAD, default="D")
     portada = models.ImageField(upload_to="portadas/", null=True, blank=True)
     valoracion_media = models.FloatField(blank=True, null=True, default=None)
-    numero_valoraciones = models.IntegerField(default=0)
 
     def actualizar_valoracion_media(self):
-        # Obtener todas las valoraciones asociadas al libro
+        # Obtengo todas las valoraciones asociadas al libro
         reviews = Valoracion.objects.filter(prestamo_valoracion__libro_prestado=self)
 
-        # Calcular el promedio de las valoraciones
+        # Calculo el promedio de las valoraciones
         avg_rating = reviews.aggregate(Avg("rating"))["rating__avg"]
-        # Actualizar la valoración media del libro
+        # Actualizo la valoración media del libro
         if avg_rating is not None:
             self.valoracion_media = avg_rating
-        else:
-            # Si no hay valoraciones, establece la media en 0 o cualquier otro valor predeterminado
-            self.valoracion_media = 0  # Puedes cambiar esto según tus necesidades
 
-        # Guardar el libro actualizado
+        # Guardo el libro actualizado
         self.save()
 
 
