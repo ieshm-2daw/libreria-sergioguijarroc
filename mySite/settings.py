@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 
+from django.urls import reverse_lazy
+
 
 AUTH_USER_MODEL = "biblioteca.Usuario"
 
@@ -60,7 +62,7 @@ ROOT_URLCONF = "mySite.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [os.path.join(BASE_DIR, "templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -131,3 +133,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # MEDIA
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/MEDIA/"  # Es global para todas las aplicaciones
+
+LOGIN_REDIRECT_URL = reverse_lazy("listar_libros")
+LOGOUT_REDIRECT_URL = reverse_lazy("login")

@@ -14,10 +14,15 @@ from .models import Libro, Prestamo, Valoracion
 from django.views import View
 from django.db.models import Avg
 
+from django.contrib.auth.mixins import (
+    LoginRequiredMixin,
+)  # Esto es para que solo los usuarios logueados puedan acceder a ciertas vistas
+
+
 # Create your views here.
 
 
-class ListarLibros(ListView):
+class ListarLibros(LoginRequiredMixin, ListView):
     model = Libro
     template_name = "biblioteca/listar_libros.html"
 
