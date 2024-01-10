@@ -135,4 +135,4 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/MEDIA/"  # Es global para todas las aplicaciones
 
 LOGIN_REDIRECT_URL = reverse_lazy("listar_libros")
-LOGOUT_REDIRECT_URL = reverse_lazy("login")
+LOGOUT_REDIRECT_URL = reverse_lazy("logout")

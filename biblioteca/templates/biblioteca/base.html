@@ -19,8 +19,13 @@
                 <h1 class="text-center my-3 ">Biblioteca</h1>
             </div>
         </div>
-        <a href="{%url 'login' %}">Iniciar Sesión</a>
-        <a href="{%url 'logout' %}">Cerrar Sesión</a>
+        {% if request.user.is_authenticated%}
+            <p>Bienvenido, {{request.user.username}}
+            <a href="{%url 'logout' %}">Cerrar Sesión</a>
+        {%else%}
+            <a href="{%url 'login' %}">Iniciar Sesión</a> 
+            
+        {%endif%}
         {%block content%}{%endblock%}
     </div>
 </body>
